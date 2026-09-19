@@ -8,7 +8,7 @@
 
 // Allow override without editing code (e.g. Vercel env injection):
 //   <script>window.FEEDBACK_WEBHOOK_URL="https://..."</script>
-const WEBHOOK_URL = window.FEEDBACK_WEBHOOK_URL || 'https://pranav27.app.n8n.cloud/webhook/product-feedback';
+const WEBHOOK_URL = window.FEEDBACK_WEBHOOK_URL || 'https://pranav277.app.n8n.cloud/webhook/product-feedback';
 
 // Limits & tuning
 const MAX_FEEDBACK_LEN = 1500;
