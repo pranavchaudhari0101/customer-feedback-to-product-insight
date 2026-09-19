@@ -367,6 +367,18 @@ body {
   color: #f87171;
 }
 
+.rec-tag {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  border: 1px solid var(--border-input);
+  border-radius: 4px;
+  padding: 1px 6px;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
 .rating-feedback-hint {
   font-family: var(--font-mono);
   font-size: 0.75rem;

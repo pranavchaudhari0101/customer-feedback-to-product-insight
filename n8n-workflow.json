@@ -7,7 +7,7 @@
         "path": "product-feedback",
         "responseMode": "whenReceived",
         "responseCode": 200,
-        "responseData": "={\"success\": true, \"id\": {{ $json.feedback[0].id ? '\"' + $json.feedback[0].id + '\"' : 'null' }}}",
+        "responseData": "={\"success\": true, \"id\": {{ $json.id ? '\"' + $json.id + '\"' : 'null' }}}",
         "options": {}
       },
       "id": "webhook-product-feedback",
@@ -21,29 +21,26 @@
       "parameters": {
         "assignments": {
           "assignments": [
-            { "id": "a-id", "name": "id", "type": "string", "value": "={{ $json.feedback[0].id }}" },
-            { "id": "a-date", "name": "date", "type": "string", "value": "={{ $json.feedback[0].date }}" },
-            { "id": "a-sub", "name": "submitted_at", "type": "string", "value": "={{ $json.feedback[0].submitted_at }}" },
-            { "id": "a-src", "name": "source", "type": "string", "value": "={{ $json.feedback[0].source }}" },
-            { "id": "a-seg", "name": "user_segment", "type": "string", "value": "={{ $json.feedback[0].user_segment }}" },
-            { "id": "a-rating", "name": "rating", "type": "number", "value": "={{ $json.feedback[0].rating }}" },
-            { "id": "a-fb", "name": "feedback", "type": "string", "value": "={{ $json.feedback[0].feedback }}" },
-            { "id": "a-email", "name": "email", "type": "string", "value": "={{ $json.feedback[0].email || '' }}" },
-            { "id": "a-url", "name": "page_url", "type": "string", "value": "={{ $json.feedback[0].page_url || '' }}" },
-            { "id": "a-ua", "name": "user_agent", "type": "string", "value": "={{ $json.feedback[0].user_agent || '' }}" }
+            { "id": "a-id", "name": "id", "type": "string", "value": "={{ $json.id }}" },
+            { "id": "a-date", "name": "date", "type": "string", "value": "={{ $json.date }}" },
+            { "id": "a-src", "name": "source", "type": "string", "value": "={{ $json.source }}" },
+            { "id": "a-seg", "name": "user_segment", "type": "string", "value": "={{ $json.user_segment }}" },
+            { "id": "a-rating", "name": "rating", "type": "number", "value": "={{ $json.rating }}" },
+            { "id": "a-fb", "name": "feedback", "type": "string", "value": "={{ $json.feedback }}" },
+            { "id": "a-email", "name": "email", "type": "string", "value": "={{ $json.email || '' }}" }
           ]
         },
         "options": {}
       },
       "id": "set-normalize",
-      "name": "Normalize feedback[0]",
+      "name": "Normalize feedback",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [460, 300]
     },
     {
       "parameters": {
-        "content": "## Product Feedback — setup\n1. Import this workflow into n8n (Workflows → Import from file).\n2. Open `Webhook: product-feedback` → Method POST, Path `product-feedback`.\n3. Production URL must be `.../webhook/product-feedback` (use Production URL, not Test URL).\n4. Workflow must be **Active** for Production URL to return 200 (Test URL only works while listening).\n5. CORS: n8n Cloud auto-responds to OPTIONS. If self-hosted, set `N8N_CORS_ALLOW_ORIGIN=*` or your Vercel domain.\n6. Connect `Normalize feedback[0]` → Google Sheets / Notion / Slack / AI Agent as needed.\n7. Frontend payload: `{ feedback: [{ id, source, user_segment, date, submitted_at, rating, feedback, email, page_url, user_agent }] }`. Extra fields are ignored if unused.",
+        "content": "## Product Feedback — setup\n1. Import this workflow into n8n (Workflows → Import from file).\n2. Open `Webhook: product-feedback` → Method POST, Path `product-feedback`.\n3. Production URL must be `https://pranav277.app.n8n.cloud/webhook/product-feedback` (use Production URL, not Test URL).\n4. Workflow must be **Active** for Production URL to return 200 (Test URL only works while listening).\n5. CORS: n8n Cloud auto-responds to OPTIONS. If self-hosted, set `N8N_CORS_ALLOW_ORIGIN=*` or your Vercel domain.\n6. Connect `Normalize feedback` → Google Sheets / Notion / Slack / AI Agent as needed.\n7. Frontend posts the flat contract: `{ id, source, user_segment, date, rating, feedback }` (+ `email` only when the user provides one; ignored until a store/use step is added). Only `feedback` is mandatory.",
         "height": 320,
         "width": 420,
         "color": 4
@@ -57,7 +54,7 @@
   ],
   "connections": {
     "Webhook: product-feedback": {
-      "main": [[{ "node": "Normalize feedback[0]", "type": "main", "index": 0 }]]
+      "main": [[{ "node": "Normalize feedback", "type": "main", "index": 0 }]]
     }
   },
   "active": true,

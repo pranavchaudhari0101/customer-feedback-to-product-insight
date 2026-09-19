@@ -525,26 +525,11 @@ function validateForm(feedbackValue) {
     if (!firstBad && wrapEl) firstBad = wrapEl;
   };
 
-  // Rating (required)
-  if (!selectedRating) {
-    markBad(ratingError, ratingContainer, 'groupRating');
-  } else {
-    hideFieldError(ratingError, ratingContainer);
-  }
-
-  // Source (required)
-  if (!sourceSelect.value) {
-    markBad(sourceError, sourceSelect.closest('.select-box-wrap'), 'groupSource');
-  } else {
-    hideFieldError(sourceError, sourceSelect.closest('.select-box-wrap'));
-  }
-
-  // Segment (required)
-  if (!userSegmentSelect.value) {
-    markBad(segmentError, userSegmentSelect.closest('.select-box-wrap'), 'groupUserSegment');
-  } else {
-    hideFieldError(segmentError, userSegmentSelect.closest('.select-box-wrap'));
-  }
+  // Rating / Source / Segment are RECOMMENDED but optional —
+  // the workflow defaults gracefully, only `feedback` is mandatory.
+  hideFieldError(ratingError, ratingContainer);
+  hideFieldError(sourceError, sourceSelect.closest('.select-box-wrap'));
+  hideFieldError(segmentError, userSegmentSelect.closest('.select-box-wrap'));
 
   // Email (optional, but must be valid if present)
   const emailVal = emailInput.value.trim();
@@ -593,14 +578,12 @@ form.addEventListener('submit', async (e) => {
   const { ok, firstBad } = validateForm(feedbackValue);
   if (!ok) {
     sfx.playPop(220);
-    const messages = [];
-    if (!selectedRating) messages.push('rating');
-    if (!sourceSelect.value) messages.push('channel');
-    if (!userSegmentSelect.value) messages.push('profile');
-    if (!feedbackValue || feedbackValue.length < MIN_FEEDBACK_LEN) messages.push('feedback');
     const emailVal = emailInput.value.trim();
-    if (emailVal && !EMAIL_RE.test(emailVal)) messages.push('valid email');
-    showToast(`Please complete: ${messages.join(', ')}`, 'error');
+    if (emailVal && !EMAIL_RE.test(emailVal)) {
+      showToast('Please enter a valid email address', 'error');
+    } else {
+      showToast('Please enter your feedback before submitting', 'error');
+    }
     if (firstBad && firstBad.scrollIntoView) {
       firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else {
@@ -626,26 +609,23 @@ form.addEventListener('submit', async (e) => {
     return;
   }
 
-  // Payload for n8n — `feedback` array kept for backwards compatibility,
-  // extra context fields help routing/triage in n8n.
+  // Flat payload exactly matching the n8n Webhook Feedback contract:
+  // { id, source, user_segment, date, rating, feedback }
+  // Only `feedback` is mandatory — everything else may be null and the
+  // workflow fills safe defaults. `email` is sent only when provided;
+  // the workflow ignores it until a store/use step is added.
   const emailVal = emailInput.value.trim();
-  const now = new Date();
   const finalPayload = {
-    feedback: [
-      {
-        id: generateFeedbackId(),
-        source: sourceSelect.value,
-        user_segment: userSegmentSelect.value,
-        date: getTodayDateString(),
-        submitted_at: now.toISOString(),
-        rating: Number(selectedRating),
-        feedback: feedbackValue,
-        email: emailVal && EMAIL_RE.test(emailVal) ? emailVal : null,
-        page_url: location.href,
-        user_agent: navigator.userAgent
-      }
-    ]
+    id: generateFeedbackId(),
+    source: sourceSelect.value || null,
+    user_segment: userSegmentSelect.value || null,
+    date: getTodayDateString(),
+    rating: selectedRating ? Number(selectedRating) : null,
+    feedback: feedbackValue
   };
+  if (emailVal && EMAIL_RE.test(emailVal)) {
+    finalPayload.email = emailVal;
+  }
 
   submitBtn.classList.add('loading');
   submitBtn.disabled = true;
@@ -654,7 +634,7 @@ form.addEventListener('submit', async (e) => {
   try {
     await postToN8n(finalPayload, { timeoutMs: REQUEST_TIMEOUT_MS, retries: 1 });
     recordSubmission(Date.now(), feedbackValue);
-    showRealSuccess(finalPayload.feedback[0]);
+    showRealSuccess(finalPayload);
   } catch (err) {
     console.error('Submission error:', err);
     showToast(friendlySubmitError(err), 'error');
@@ -678,9 +658,9 @@ function showRealSuccess(item) {
 
   document.getElementById('receiptId').textContent = item.id;
   document.getElementById('receiptDate').textContent = item.date;
-  document.getElementById('receiptChannel').textContent = item.source;
-  document.getElementById('receiptSegment').textContent = item.user_segment;
-  document.getElementById('receiptRating').textContent = `${item.rating}/5 ★`;
+  document.getElementById('receiptChannel').textContent = item.source || 'Not specified';
+  document.getElementById('receiptSegment').textContent = item.user_segment || 'Not specified';
+  document.getElementById('receiptRating').textContent = item.rating ? `${item.rating}/5 ★` : 'Not rated';
 
   transitionToSuccess();
   showToast('Feedback submitted successfully', 'success');
@@ -691,15 +671,15 @@ function showFakeSuccess() {
   const fake = {
     id: generateFeedbackId(),
     date: getTodayDateString(),
-    source: sourceSelect.value || 'Website',
-    user_segment: userSegmentSelect.value || 'Unknown',
-    rating: selectedRating || 5
+    source: sourceSelect.value || null,
+    user_segment: userSegmentSelect.value || null,
+    rating: selectedRating || null
   };
   document.getElementById('receiptId').textContent = fake.id;
   document.getElementById('receiptDate').textContent = fake.date;
-  document.getElementById('receiptChannel').textContent = fake.source;
-  document.getElementById('receiptSegment').textContent = fake.user_segment;
-  document.getElementById('receiptRating').textContent = `${fake.rating}/5 ★`;
+  document.getElementById('receiptChannel').textContent = fake.source || 'Not specified';
+  document.getElementById('receiptSegment').textContent = fake.user_segment || 'Not specified';
+  document.getElementById('receiptRating').textContent = fake.rating ? `${fake.rating}/5 ★` : 'Not rated';
   transitionToSuccess();
 }
 
