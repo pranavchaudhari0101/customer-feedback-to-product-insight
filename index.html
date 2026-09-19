@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Feedback</title>
+  <meta name="description" content="Share your product feedback directly with our engineering and product team.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- GSAP for animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="top-navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <div class="brand-shield">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="shield-svg">
+            <path d="M12 2L3 6V11.5C3 16.8 6.8 21.7 12 23C17.2 21.7 21 16.8 21 11.5V6L12 2Z" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="2"/>
+            <path d="M9 12L11 14L15 9" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">FEEDBACK</span>
+      </div>
+
+      <div class="nav-links">
+        <a href="#home" class="nav-link active">Home</a>
+        <a href="#formCard" class="nav-link" data-scroll>Form</a>
+        <a href="#successScreen" class="nav-link" data-soon>Roadmap</a>
+        <a href="#toastStack" class="nav-link" data-soon>Contact</a>
+      </div>
+
+      <div class="nav-action">
+        <button type="button" class="nav-cta-btn" id="navGiveFeedback">Give Feedback</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Ambient Light Gradients -->
+  <div class="ambient-lights">
+    <div class="light-glow glow-top-right"></div>
+    <div class="light-glow glow-bottom-left"></div>
+  </div>
+
+  <!-- Main Split-Screen Section -->
+  <main class="hero-section" id="home">
+    <div class="hero-container">
+      
+      <!-- Left Column: Hero Branding & Typography -->
+      <div class="hero-left">
+        <div class="tile-logo">
+          <span class="tile-square tile-blue"></span>
+          <span class="tile-square tile-coral"></span>
+          <span class="tile-square tile-cyan"></span>
+          <span class="tile-square tile-mint"></span>
+        </div>
+
+        <h1 class="hero-title">
+          WELCOME TO<br>FEEDBACK
+        </h1>
+
+        <p class="hero-subtitle">
+          Tell us about your experience in just<br>a few steps
+        </p>
+      </div>
+
+      <!-- Right Column: Frosted Glass Form Card -->
+      <div class="hero-right">
+        <div class="glass-form-card" id="formCard">
+          
+          <!-- Card Header with custom line divider -->
+          <div class="card-top-header">
+            <div class="header-title-wrap">
+              <h2 class="card-title">Feedback Details</h2>
+              <span class="step-indicator">1/1</span>
+            </div>
+            <div class="divider-line">
+              <span class="divider-accent"></span>
+              <span class="divider-track"></span>
+            </div>
+          </div>
+
+          <!-- Feedback Form -->
+          <form id="feedbackForm" novalidate>
+            
+            <!-- 1. Star Rating Field -->
+            <div class="form-group" id="groupRating">
+              <div class="label-row">
+                <label class="form-label" for="ratingContainer">Rating <span class="req-star">*</span></label>
+                <span class="rating-feedback-hint" id="ratingScoreText">Tap to rate experience</span>
+              </div>
+              
+              <div class="stars-picker" id="ratingContainer" role="radiogroup" aria-label="Rating out of 5 stars">
+                <button type="button" class="star-btn" data-value="1" aria-label="1 star" role="radio" aria-checked="false">
+                  <i data-lucide="star" class="star-icon"></i>
+                  <span class="star-num">1</span>
+                </button>
+                <button type="button" class="star-btn" data-value="2" aria-label="2 stars" role="radio" aria-checked="false">
+                  <i data-lucide="star" class="star-icon"></i>
+                  <span class="star-num">2</span>
+                </button>
+                <button type="button" class="star-btn" data-value="3" aria-label="3 stars" role="radio" aria-checked="false">
+                  <i data-lucide="star" class="star-icon"></i>
+                  <span class="star-num">3</span>
+                </button>
+                <button type="button" class="star-btn" data-value="4" aria-label="4 stars" role="radio" aria-checked="false">
+                  <i data-lucide="star" class="star-icon"></i>
+                  <span class="star-num">4</span>
+                </button>
+                <button type="button" class="star-btn" data-value="5" aria-label="5 stars" role="radio" aria-checked="false">
+                  <i data-lucide="star" class="star-icon"></i>
+                  <span class="star-num">5</span>
+                </button>
+                <button type="button" class="clear-star-btn" id="clearRatingBtn" title="Clear rating" style="display: none;">
+                  <i data-lucide="x" class="clear-icon"></i>
+                </button>
+              </div>
+              <input type="hidden" id="ratingInput" name="rating" value="">
+              <div class="error-banner" id="ratingError">
+                <i data-lucide="alert-circle" class="alert-icon"></i>
+                <span>Please select a rating.</span>
+              </div>
+            </div>
+
+            <!-- 2. Source Selection -->
+            <div class="form-group" id="groupSource">
+              <label class="form-label" for="sourceSelect">Where are you giving this feedback from? <span class="req-star">*</span></label>
+              <div class="select-box-wrap">
+                <select id="sourceSelect" name="source" class="tech-select" required>
+                  <option value="" disabled selected>Select feedback channel</option>
+                  <option value="Website">Website</option>
+                  <option value="App Store">App Store</option>
+                  <option value="Play Store">Play Store</option>
+                  <option value="Support Ticket">Support Ticket</option>
+                  <option value="Survey">Survey</option>
+                  <option value="User Interview">User Interview</option>
+                  <option value="Chat">Chat</option>
+                  <option value="NPS">NPS</option>
+                  <option value="Social Media">Social Media</option>
+                </select>
+                <i data-lucide="chevron-down" class="tech-chevron"></i>
+              </div>
+              <div class="error-banner" id="sourceError">
+                <i data-lucide="alert-circle" class="alert-icon"></i>
+                <span>Please select a feedback channel.</span>
+              </div>
+            </div>
+
+            <!-- 3. User Segment Selection -->
+            <div class="form-group" id="groupUserSegment">
+              <label class="form-label" for="userSegmentSelect">How would you describe yourself? <span class="req-star">*</span></label>
+              <div class="select-box-wrap">
+                <select id="userSegmentSelect" name="user_segment" class="tech-select" required>
+                  <option value="" disabled selected>Select user profile</option>
+                  <option value="New User">New User</option>
+                  <option value="Returning User">Returning User</option>
+                  <option value="Power User">Power User</option>
+                </select>
+                <i data-lucide="chevron-down" class="tech-chevron"></i>
+              </div>
+              <div class="error-banner" id="segmentError">
+                <i data-lucide="alert-circle" class="alert-icon"></i>
+                <span>Please select a user profile.</span>
+              </div>
+            </div>
+
+            <!-- 4. Email (Optional, sent to n8n only if provided) -->
+            <div class="form-group" id="groupEmail">
+              <label class="form-label" for="emailInput">Email (optional - for replies only)</label>
+              <div class="input-box-wrap">
+                <input 
+                  type="email" 
+                  id="emailInput" 
+                  name="email" 
+                  placeholder="Enter email address"
+                  autocomplete="email"
+                  maxlength="254"
+                >
+              </div>
+              <div class="error-banner" id="emailError">
+                <i data-lucide="alert-circle" class="alert-icon"></i>
+                <span>Please enter a valid email address.</span>
+              </div>
+            </div>
+
+            <!-- 5. Feedback Textarea (Required) -->
+            <div class="form-group" id="groupFeedback">
+              <div class="label-row">
+                <label class="form-label" for="feedbackText">Your feedback <span class="req-star">*</span></label>
+                <span class="mono-char-count"><span id="charCount">0</span>/1500</span>
+              </div>
+              <div class="input-box-wrap textarea-wrap">
+                <textarea 
+                  id="feedbackText" 
+                  name="feedback" 
+                  rows="4" 
+                  placeholder="Tell us what's working or what's frustrating…"
+                  required
+                  minlength="5"
+                  maxlength="1500"
+                ></textarea>
+              </div>
+              <div class="error-banner" id="feedbackError">
+                <i data-lucide="alert-circle" class="alert-icon"></i>
+                <span>Please enter at least 5 characters of feedback (max 1500).</span>
+              </div>
+            </div>
+
+            <!-- Honeypot anti-bot field (must stay empty) -->
+            <div class="hp-wrap" aria-hidden="true">
+              <label for="companyWebsite">Company website</label>
+              <input type="text" id="companyWebsite" name="company_website" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- Rate-limit notice -->
+            <div class="rate-limit-note" id="rateLimitNote" role="status"></div>
+
+            <!-- Submit Button (Green style matching reference) -->
+            <div class="form-submit-row">
+              <button type="submit" class="join-btn" id="submitBtn">
+                <span class="btn-label">Submit feedback</span>
+                <div class="btn-spinner" id="submitSpinner">
+                  <span class="spinner-ring"></span>
+                  <span>Sending...</span>
+                </div>
+              </button>
+            </div>
+
+          </form>
+
+          <!-- Success Screen View -->
+          <div class="card-success-view" id="successScreen" style="display: none;">
+            <div class="success-header">
+              <div class="success-badge">
+                <i data-lucide="check" class="check-icon"></i>
+              </div>
+              <h3 class="success-heading">Feedback Received</h3>
+              <p class="success-sub">Thank you for sharing your thoughts with our product team.</p>
+            </div>
+
+            <div class="receipt-box">
+              <div class="receipt-item">
+                <span class="r-label">Reference ID</span>
+                <span class="r-val" id="receiptId">—</span>
+              </div>
+              <div class="receipt-item">
+                <span class="r-label">Date</span>
+                <span class="r-val" id="receiptDate">—</span>
+              </div>
+              <div class="receipt-item">
+                <span class="r-label">Channel</span>
+                <span class="r-val" id="receiptChannel">—</span>
+              </div>
+              <div class="receipt-item">
+                <span class="r-label">User Segment</span>
+                <span class="r-val" id="receiptSegment">—</span>
+              </div>
+              <div class="receipt-item">
+                <span class="r-label">Rating</span>
+                <span class="r-val" id="receiptRating">—</span>
+              </div>
+            </div>
+
+            <div class="success-btn-wrap">
+              <button type="button" class="join-btn secondary" id="sendAnotherBtn">
+                Submit another response
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Notification Toast -->
+  <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
